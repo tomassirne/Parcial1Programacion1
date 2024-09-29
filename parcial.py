@@ -198,6 +198,7 @@ print(f"Proporción de matrimonios registrados en 2018 que se divorciaron: {prop
 # ------ Ejercicio 5 ----------
 graficar_divorcios(dic)
 print("Teniendo en cuenta que la pandemia abarcó del año 2020 al 2022, observamos que la misma aumentó la cantidad de divorcios")
-print("Cabe destacar que el año 2020 es en particular muy bajo, pero entendemos que es porque fue caracterizado por un encierro casi absoluto de la poblacion, lo que produjo que no se pudiera tramitar el divorcio")
-#Para demostrar esta conclusion analizaremos los meses de registro de divorcios en 2020:
+print("Cabe destacar que el año 2020 fue un año particular por dos razones. En primer lugar, la pandemia empezo a afectar a Argentina en Marzo, por lo tanto el mes de Enero y Febrero continuan con la tendencia de los años prepandemia. En segundo lugar fue caracterizado por un encierro casi absoluto de la poblacion, lo que produjo que no se pudiera tramitar el divorcio")
+print("Esto justifica que el año 2020 fuese un año bajo en cantidad de divorcios a pesar de que la pandemia aumentó los mismos.")
+#Para demostrar que no se registraron divorcios en todos los meses del 2020, crearemos la siguiente funcion:
 print(meses_divorcio(archivo,2020))
