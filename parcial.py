@@ -99,7 +99,45 @@ def proporcion_divorcios_en_2018(diccionario):
 
 
 #%%
+# --------- Ejercicio 4 -------
+import matplotlib.pyplot as plt
+def proporciones_divorcios_por_genero_2018(diccionario):
+    proporciones = {
+        "Masculino-Masculino": 0,
+        "Masculino-Femenino": 0,
+        "Femenino-Femenino": 0,
+        "Masculino-No declara": 0,
+        "Femenino-No declara": 0,
+        "No declara-No declara": 0
+    }
 
+    total_divorcios_2018 = 0
+    for clave, valor in diccionario.items():
+        genero_1, genero_2, anio_matrimonio, anio_divorcio = clave
+        if anio_matrimonio == '2018' and anio_divorcio > '2018':
+            tipo_matrimonio = f"{genero_1}-{genero_2}"
+            # Aquí utilizamos setdefault para asegurar que la clave exista
+            proporciones[tipo_matrimonio] = proporciones.setdefault(tipo_matrimonio, 0) + valor
+            total_divorcios_2018 += valor
+
+
+    # Calcular las proporciones
+    if total_divorcios_2018 > 0:
+        for tipo in proporciones:
+            proporciones[tipo] /= total_divorcios_2018
+    else:
+        print("No hay divorcios registrados para parejas que se casaron en 2018.")
+
+    return proporciones
+        
+
+
+
+
+
+
+
+#%%
 # ------ Ejercicio 5 ----------
 def print_tabla(divorcios_por_año):
     print("Cantidad de divorcios por Año:")
@@ -150,7 +188,7 @@ def meses_divorcio(archivo,año):
             if record["FECHA_MATRIMONIO"][5:9] == str(año): meses.add(record["FECHA_MATRIMONIO"][2:5])
         
     return meses
-
+#%%
 
 
 
@@ -158,7 +196,7 @@ def meses_divorcio(archivo,año):
 # ------ Ejercicio 0 ----------
 archivo = "dataset_divorcios.csv"
 dic = catalogar(archivo)
-
+#%%
 
 
 # ------ Ejercicio 1 ----------
@@ -188,13 +226,21 @@ for k,v in prom_tipos.items():
 # -------- Ejercicio 3 ---------
 # Usar la función con el diccionario generado por catalogar()
 diccionario = catalogar("dataset_divorcios.csv")
-proporcion = proporcion_divorcios_en_2018(diccionario)
+proporcion = proporcion_divorcios_en_2018(dic)
 
 # Mostrar el resultado
 print(f"Proporción de matrimonios registrados en 2018 que se divorciaron: {proporcion:.2%}")
-
-
-
+#%%
+# --------- Ejercicio 4 ---------
+# llamada de funcion
+proporciones_2018 = proporciones_divorcios_por_genero_2018(dic)
+plt.bar(proporciones_2018.keys(), proporciones_2018.values(), color=["skyblue"], width=0.8)
+plt.xlabel("Tipo de Matrimonio")
+plt.ylabel("Proporción de Divorcios en 2018")
+plt.title("Proporción de Divorcios por Género en 2018")
+plt.xticks(rotation=45)  # Rotar las etiquetas del eje x para mejor legibilidad
+plt.show()
+#%%
 # ------ Ejercicio 5 ----------
 graficar_divorcios(dic)
 print("Teniendo en cuenta que la pandemia abarcó del año 2020 al 2022, observamos que la misma aumentó la cantidad de divorcios")
@@ -202,3 +248,5 @@ print("Cabe destacar que el año 2020 fue un año particular por dos razones. En
 print("Esto justifica que el año 2020 fuese un año bajo en cantidad de divorcios a pesar de que la pandemia aumentó los mismos.")
 #Para demostrar que no se registraron divorcios en todos los meses del 2020, crearemos la siguiente funcion:
 print(meses_divorcio(archivo,2020))
+#%%
+print(dic)
