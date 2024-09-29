@@ -9,7 +9,10 @@ def catalogar(archivo):
 
         for row in rows:
             record = dict(zip(headers, row))
-            clave = (record["GENERO_1"],record["GENERO_2"],record["FECHA_MATRIMONIO"],record["FECHA_CREACION"])
+            if record["GENERO_1"] == "": record["GENERO_1"] = "No declara"
+            if record["GENERO_2"] == "": record["GENERO_2"] = "No declara"
+        
+            clave = (record["GENERO_1"],record["GENERO_2"],record["FECHA_MATRIMONIO"][5:9],record["FECHA_CREACION"][5:9])
             
 
             if clave in diccionario: diccionario[clave] += 1
@@ -18,4 +21,8 @@ def catalogar(archivo):
 
     return diccionario
 
-print(catalogar("dataset_divorcios.csv"))
+dic = catalogar("dataset_divorcios.csv")
+print(dic)
+print(len(dic.keys()))
+
+
