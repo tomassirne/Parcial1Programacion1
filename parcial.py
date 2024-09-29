@@ -1,3 +1,4 @@
+#%%
 import csv
 import matplotlib.pyplot as plt
 
@@ -25,7 +26,7 @@ def catalogar(archivo):
                 else: diccionario[clave] = 1
         
     return diccionario
-
+#%%
 
 # ------ Ejercicio 1 ----------
 def duracion_maxima(divorcios):
@@ -39,7 +40,7 @@ def duracion_promedio(divorcios):
 
 def duracion_matrimonios_divorciados(divorcios):
     return duracion_maxima(divorcios), duracion_minima(divorcios), duracion_promedio(divorcios)
-
+#%%
 
 
 # ------ Ejercicio 2 ----------
@@ -64,8 +65,40 @@ def promedio_por_tipos(divorcios):
         else: dic_nn[k] = v
 
     return {"Masculino-Masculino": duracion_promedio(dic_mm),"Masculino-Femenino": duracion_promedio(dic_mf),"Masculino-No declara": duracion_promedio(dic_mn),"Femenino-Femenino": duracion_promedio(dic_ff),"Femenino-No declara": duracion_promedio(dic_mm),"No declara-No declara": duracion_promedio(dic_mm)}
+#%%
+# ------ Ejercicio 3 -----------
+from datetime import datetime
+
+def proporcion_divorcios_en_2018(diccionario):
+    total_matrimonios_2018 = 0
+    matrimonios_divorciados_2018 = 0
+
+    for clave in diccionario:
+        fecha_matrimonio = clave[2]  # FECHA_MATRIMONIO
+        fecha_divorcio = clave[3]    # FECHA_DIVORCIO (si existe)
+
+        # Convertir fecha de matrimonio en objeto datetime
+        fecha_matrimonio = datetime.strptime(fecha_matrimonio, "%Y-%m-%d")
+
+        # Verificar si el matrimonio fue en 2018
+        if fecha_matrimonio.year == 2018:
+            total_matrimonios_2018 += 1
+
+            # Verificar si existe una fecha de divorcio
+            if fecha_divorcio:
+                fecha_divorcio = datetime.strptime(fecha_divorcio, "%Y-%m-%d")
+                matrimonios_divorciados_2018 += 1
+
+    if total_matrimonios_2018 == 0:
+        return 0  # Evitar división por cero si no hay matrimonios en 2018
+
+    # Calcular la proporción
+    proporcion = matrimonios_divorciados_2018 / total_matrimonios_2018
+    return proporcion
 
 
+
+#%%
 
 # ------ Ejercicio 5 ----------
 def print_tabla(divorcios_por_año):
@@ -133,7 +166,7 @@ duracion = duracion_matrimonios_divorciados(dic)
 print(f"La duracion maxima de matrimonios que se divorciaron es {duracion_matrimonios_divorciados(dic)[0]} años.")
 print(f"La duracion minima de matrimonios que se divorciaron es {duracion_matrimonios_divorciados(dic)[1]} años.")
 print(f"La duracion promedio de matrimonios que se divorciaron es {duracion_matrimonios_divorciados(dic)[2]:.2f} años.")
-
+#%%
 
 
 # ------ Ejercicio 2 ----------
@@ -151,6 +184,14 @@ Tipos de Matrimonio:
 prom_tipos = promedio_por_tipos(dic)
 for k,v in prom_tipos.items():
     print(f"La duracion promedio de matrimonios {k} que se divorciaron es {v:.2f} años.")
+    #%%
+# -------- Ejercicio 3 ---------
+# Usar la función con el diccionario generado por catalogar()
+diccionario = catalogar("dataset_divorcios.csv")
+proporcion = proporcion_divorcios_en_2018(diccionario)
+
+# Mostrar el resultado
+print(f"Proporción de matrimonios registrados en 2018 que se divorciaron: {proporcion:.2%}")
 
 
 
