@@ -1,4 +1,5 @@
 import csv
+import matplotlib.pyplot as plt
 
 # ------ Ejercicio 0 ----------
 def catalogar(archivo):
@@ -66,9 +67,64 @@ def promedio_por_tipos(divorcios):
 
 
 
+# ------ Ejercicio 5 ----------
+def print_tabla(divorcios_por_año):
+    print("Cantidad de divorcios por Año:")
+    for año,divorcio in divorcios_por_año.items():
+        print(f"{año}: {divorcio}")
+
+
+def graficar_divorcios(divorcios):
+    #Creao un dic del tipo {año: cant_divorcios}
+    divorcios_por_año = {}
+    for (_,_,_,ffin),v in divorcios.items():
+        k = int(ffin)
+        if k in divorcios_por_año.keys(): divorcios_por_año[k] += v
+        else: divorcios_por_año[k] = v
+
+    divorcios_por_año = dict(sorted(divorcios_por_año.items()))
+
+    print_tabla(divorcios_por_año)
+
+
+    #Creo 3 dics separando en prepandemia, pandemia y postpandemia
+    divorcios_pandemia = {}
+    divorcios_pre_pandemia = {}
+    divorcios_post_pandemia = {}
+    for año,div in divorcios_por_año.items():
+        if año <= 2020: divorcios_pre_pandemia[año] = div
+        if año in [2020,2021,2022]: divorcios_pandemia[año] = div
+        if año >= 2022: divorcios_post_pandemia[año] = div
+
+    plt.plot(list(divorcios_pre_pandemia.keys()),list(divorcios_pre_pandemia.values()),color='b',marker='o', linestyle='-')
+    plt.plot(list(divorcios_pandemia.keys()),list(divorcios_pandemia.values()),color='r',marker='o', linestyle='-')
+    plt.plot(list(divorcios_post_pandemia.keys()),list(divorcios_post_pandemia.values()),color='b',marker='o', linestyle='-')
+    plt.xlabel("Año")
+    plt.ylabel("Divorcios")
+    plt.suptitle("Cantidad de Divorcios por Año", fontsize = 14)
+    plt.title('En rojo vemos los años afectados por la pandemia. En azul, el resto de los años',fontsize= 10)
+    plt.show()
+
+
+def meses_divorcio(archivo,año):
+    with open(archivo, 'rt', encoding='utf-8-sig') as f:
+        rows = csv.reader(f)
+        headers = next(rows)
+        meses = set()
+
+        for row in rows:
+            record = dict(zip(headers, row))
+            if record["FECHA_MATRIMONIO"][5:9] == str(año): meses.add(record["FECHA_MATRIMONIO"][2:5])
+        
+    return meses
+
+
+
+
 
 # ------ Ejercicio 0 ----------
-dic = catalogar("dataset_divorcios.csv")
+archivo = "dataset_divorcios.csv"
+dic = catalogar(archivo)
 
 
 
@@ -95,3 +151,12 @@ Tipos de Matrimonio:
 prom_tipos = promedio_por_tipos(dic)
 for k,v in prom_tipos.items():
     print(f"La duracion promedio de matrimonios {k} que se divorciaron es {v:.2f} años.")
+
+
+
+# ------ Ejercicio 5 ----------
+graficar_divorcios(dic)
+print("Teniendo en cuenta que la pandemia abarcó del año 2020 al 2022, observamos que la misma aumentó la cantidad de divorcios")
+print("Cabe destacar que el año 2020 es en particular muy bajo, pero entendemos que es porque fue caracterizado por un encierro casi absoluto de la poblacion, lo que produjo que no se pudiera tramitar el divorcio")
+#Para demostrar esta conclusion analizaremos los meses de registro de divorcios en 2020:
+print(meses_divorcio(archivo,2020))

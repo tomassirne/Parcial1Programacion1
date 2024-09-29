@@ -1,6 +1,8 @@
+import matplotlib.pyplot as plt
+
 a = "26SEP2019:09:24:50"
 
-print(a[5:9])
+print(a[2:5])
 
 t = ("N","F")
 if "M" in t:
@@ -13,6 +15,8 @@ elif "F" in t :
 else: print("N-N")
 
 
-tu = (2,5,3)
-t[1] = 6
-print(t)
+
+
+d = {("a","f"):1,("b","f"):2}
+ls = [k[0] for k,v in d.items() for i in range(v)]
+print(ls)
