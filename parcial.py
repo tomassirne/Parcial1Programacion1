@@ -68,33 +68,30 @@ def promedio_por_tipos(divorcios):
     return {"Masculino-Masculino": duracion_promedio(dic_mm),"Masculino-Femenino": duracion_promedio(dic_mf),"Masculino-No declara": duracion_promedio(dic_mn),"Femenino-Femenino": duracion_promedio(dic_ff),"Femenino-No declara": duracion_promedio(dic_mm),"No declara-No declara": duracion_promedio(dic_mm)}
 #%%
 # ------ Ejercicio 3 -----------
+from datetime import datetime
 
-def proporcion_divorcios_en_2018(diccionario):
-    total_matrimonios_2018 = 0
-    matrimonios_divorciados_2018 = 0
+def contar_matrimonios_2018(archivo_csv):
+    """Cuenta los matrimonios registrados en 2018."""
+    contador = 0
+    with open(archivo_csv, 'r') as csvfile:
+        lector = csv.reader(csvfile)
+        next(lector)  # Saltar la cabecera
+        for fila in lector:
+            try:
+                fecha_matrimonio = datetime.strptime(fila[0], "%Y-%m-%d")
+                if fecha_matrimonio.year == 2018:
+                    contador += 1
+            except ValueError:
+                pass  # Ignora registros con formato de fecha inválido
+    return contador
 
-    for clave in diccionario:
-        fecha_matrimonio = clave[2]  # FECHA_MATRIMONIO
-        fecha_divorcio = clave[3]    # FECHA_DIVORCIO (si existe)
+def contar_divorcios_2018(diccionario):
+  contador = 0
+  for clave, valor in diccionario.items():
+    if clave[2] == '2018':
+      contador += valor
+  return contador
 
-        # Convertir fecha de matrimonio en objeto datetime
-        fecha_matrimonio = datetime.strptime(fecha_matrimonio, "%Y-%m-%d")
-
-        # Verificar si el matrimonio fue en 2018
-        if fecha_matrimonio.year == 2018:
-            total_matrimonios_2018 += 1
-
-            # Verificar si existe una fecha de divorcio
-            if fecha_divorcio:
-                fecha_divorcio = datetime.strptime(fecha_divorcio, "%Y-%m-%d")
-                matrimonios_divorciados_2018 += 1
-
-    if total_matrimonios_2018 == 0:
-        return 0  # Evitar división por cero si no hay matrimonios en 2018
-
-    # Calcular la proporción
-    proporcion = matrimonios_divorciados_2018 / total_matrimonios_2018
-    return proporcion
 
 
 
@@ -253,12 +250,16 @@ for k,v in prom_tipos.items():
     print(f"La duracion promedio de matrimonios {k} que se divorciaron es {v:.2f} años.")
     #%%
 # -------- Ejercicio 3 ---------
-# Usar la función con el diccionario generado por catalogar()
-diccionario = catalogar("dataset_divorcios.csv")
-proporcion = proporcion_divorcios_en_2018(dic)
+# Llamar a las funciones
+matrimonios_2018 = contar_matrimonios_2018("matrimonios_2018.csv")
+divorcios_2018 = contar_divorcios_2018(dic)
 
-# Mostrar el resultado
-print(f"Proporción de matrimonios registrados en 2018 que se divorciaron: {proporcion:.2%}")
+# Calcular la proporción de divorcios
+proporcion_divorcios = divorcios_2018/ matrimonios_2018 if matrimonios_2018 > 0 else 0
+
+print("Total de matrimonios en 2018:", matrimonios_2018)
+print("Total de divorcios de matrimonios de 2018:", divorcios_2018)
+print("Proporción de divorcios respecto al total de matrimonios en 2018:", f"{proporcion_divorcios:.2%}")
 #%%
 # --------- Ejercicio 4 ---------
 # llamada de funcion
