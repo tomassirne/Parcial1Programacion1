@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 
 a = "26SEP2019:09:24:50"
 
-print(a[2:5])
+print(a[0:2])
 
 t = ("N","F")
 if "M" in t:

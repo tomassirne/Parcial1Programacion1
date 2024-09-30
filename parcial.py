@@ -1,6 +1,7 @@
 #%%
 import csv
 import matplotlib.pyplot as plt
+from datetime import datetime
 
 # ------ Ejercicio 0 ----------
 def catalogar(archivo):
@@ -67,7 +68,6 @@ def promedio_por_tipos(divorcios):
     return {"Masculino-Masculino": duracion_promedio(dic_mm),"Masculino-Femenino": duracion_promedio(dic_mf),"Masculino-No declara": duracion_promedio(dic_mn),"Femenino-Femenino": duracion_promedio(dic_ff),"Femenino-No declara": duracion_promedio(dic_mm),"No declara-No declara": duracion_promedio(dic_mm)}
 #%%
 # ------ Ejercicio 3 -----------
-from datetime import datetime
 
 def proporcion_divorcios_en_2018(diccionario):
     total_matrimonios_2018 = 0
@@ -100,7 +100,6 @@ def proporcion_divorcios_en_2018(diccionario):
 
 #%%
 # --------- Ejercicio 4 -------
-import matplotlib.pyplot as plt
 def proporciones_divorcios_por_genero_2018(diccionario):
     proporciones = {
         "Masculino-Masculino": 0,
@@ -133,12 +132,42 @@ def proporciones_divorcios_por_genero_2018(diccionario):
 
 
 
-
-
-
-
 #%%
 # ------ Ejercicio 5 ----------
+def catalogar_pademia(archivo):
+    with open(archivo, 'rt', encoding='utf-8-sig') as f:
+        rows = csv.reader(f)
+        headers = next(rows)
+        dic_pre = {}
+        dic_pandemia = {}
+        dic_post = {}
+
+        for row in rows:
+            record = dict(zip(headers, row))
+            if record["GENERO_1"] == "": record["GENERO_1"] = "No declara"
+            if record["GENERO_2"] == "": record["GENERO_2"] = "No declara"
+            
+            #Hay dos registros cuya fecha de matrimonio es 01/01/1760 y fecha de divorcio es en 2024. 
+            #Asimismo hay un registro con fecha de matrimonio en el año 3201.
+            #Entendemos que son errores del dataset por lo tanto los filtraremos
+            if record["FECHA_MATRIMONIO"][5:9] == "1760" or record["FECHA_MATRIMONIO"][5:9] == "3201": pass
+
+            else:
+                clave = (record["GENERO_1"],record["GENERO_2"],record["FECHA_MATRIMONIO"][5:9],record["FECHA_CREACION"][5:9])
+
+                if int(record["FECHA_CREACION"][5:9]) < 2020 or (int(record["FECHA_CREACION"][5:9]) == 2020 and (record["FECHA_CREACION"][2:5] in ["JAN","FEB"] or (record["FECHA_CREACION"][2:5] == "MAR" and int(record["FECHA_CREACION"][0:2]) < 20 ))) :
+                    if clave in dic_pre: dic_pre[clave] += 1
+                    else: dic_pre[clave] = 1
+                elif int(record["FECHA_CREACION"][5:9]) > 2022 or (int(record["FECHA_CREACION"][5:9]) == 2022 and record["FECHA_CREACION"][2:5] in ["JAN","FEB","MAR"]):
+                    if clave in dic_post: dic_post[clave] += 1
+                    else: dic_post[clave] = 1
+                else:
+                    if clave in dic_pandemia: dic_pandemia[clave] += 1
+                    else: dic_pandemia[clave] = 1
+        
+    return dic_pre,dic_pandemia,dic_post
+
+
 def print_tabla(divorcios_por_año):
     print("Cantidad de divorcios por Año:")
     for año,divorcio in divorcios_por_año.items():
@@ -248,5 +277,29 @@ print("Cabe destacar que el año 2020 fue un año particular por dos razones. En
 print("Esto justifica que el año 2020 fuese un año bajo en cantidad de divorcios a pesar de que la pandemia aumentó los mismos.")
 #Para demostrar que no se registraron divorcios en todos los meses del 2020, crearemos la siguiente funcion:
 print(meses_divorcio(archivo,2020))
+
+
+dic_pre,dic_pandemia,dic_post = catalogar_pademia(archivo)
+"""
+Pre Pandemia: 02 nov 2015 - 20 mar 2020 => 1600 dias
+Pandemia: 20 mar 2020 - 31 mar 2022 => 741 dias
+Post Pandemia: 31 mar 2022 - 20 sep 2024 => 904 dias
+"""
+prom_d1 = sum(dic_pre.values()) / 1600
+prom_d2= sum(dic_pandemia.values()) / 741
+prom_d3 = sum(dic_post.values()) / 904
+
+proms = [prom_d1,prom_d2,prom_d3]
+labels = ['Pre Pandemia', 'Pandemia', 'Post Pandemia']
+
+plt.bar(labels, proms, color=['blue', 'green', 'red'])
+
+# Añade títulos y etiquetas
+plt.xlabel('Periodo')
+plt.ylabel('Promedio de Divorcios')
+plt.title('Promedio de Divorcios por Período')
+
+# Muestra el gráfico
+plt.show()
+
 #%%
-print(dic)
