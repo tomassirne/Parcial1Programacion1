@@ -2,6 +2,7 @@
 import csv
 import matplotlib.pyplot as plt
 from datetime import datetime
+import numpy as np
 
 # ------ Ejercicio 0 ----------
 def catalogar(archivo):
@@ -45,7 +46,7 @@ def duracion_matrimonios_divorciados(divorcios):
 
 
 # ------ Ejercicio 2 ----------
-def promedio_por_tipos(divorcios):
+def separa_tipos(divorcios):
     #Creo un dic para cada tipo de matrimonio:  
     # m -> masculino, f -> femenino, n-> no declara
     dic_mm = {}  
@@ -64,8 +65,13 @@ def promedio_por_tipos(divorcios):
             if "No declara" in k : dic_fn[k] = v
             else: dic_ff[k] = v
         else: dic_nn[k] = v
+    
+    return dic_mm,dic_ff,dic_mf,dic_nn,dic_fn,dic_mn
 
-    return {"Masculino-Masculino": duracion_promedio(dic_mm),"Masculino-Femenino": duracion_promedio(dic_mf),"Masculino-No declara": duracion_promedio(dic_mn),"Femenino-Femenino": duracion_promedio(dic_ff),"Femenino-No declara": duracion_promedio(dic_mm),"No declara-No declara": duracion_promedio(dic_mm)}
+def promedio_por_tipos(divorcios): 
+    dic_mm,dic_ff,dic_mf,dic_nn,dic_fn,dic_mn = separa_tipos(divorcios)
+
+    return {"Masculino-Masculino": duracion_promedio(dic_mm),"Masculino-Femenino": duracion_promedio(dic_mf),"Masculino-No declara": duracion_promedio(dic_mn),"Femenino-Femenino": duracion_promedio(dic_ff),"Femenino-No declara": duracion_promedio(dic_fn),"No declara-No declara": duracion_promedio(dic_nn)}
 #%%
 # ------ Ejercicio 3 -----------
 from datetime import datetime
@@ -81,6 +87,7 @@ def contar_matrimonios_2018(archivo_csv):
                 fecha_matrimonio = datetime.strptime(fila[0], "%Y-%m-%d")
                 if fecha_matrimonio.year == 2018:
                     contador += 1
+                else: print("ERROR 2018")
             except ValueError:
                 pass  # Ignora registros con formato de fecha inválido
     return contador
@@ -164,56 +171,6 @@ def catalogar_pademia(archivo):
         
     return dic_pre,dic_pandemia,dic_post
 
-
-def print_tabla(divorcios_por_año):
-    print("Cantidad de divorcios por Año:")
-    for año,divorcio in divorcios_por_año.items():
-        print(f"{año}: {divorcio}")
-
-
-def graficar_divorcios(divorcios):
-    #Creao un dic del tipo {año: cant_divorcios}
-    divorcios_por_año = {}
-    for (_,_,_,ffin),v in divorcios.items():
-        k = int(ffin)
-        if k in divorcios_por_año.keys(): divorcios_por_año[k] += v
-        else: divorcios_por_año[k] = v
-
-    divorcios_por_año = dict(sorted(divorcios_por_año.items()))
-
-    print_tabla(divorcios_por_año)
-
-
-    #Creo 3 dics separando en prepandemia, pandemia y postpandemia
-    divorcios_pandemia = {}
-    divorcios_pre_pandemia = {}
-    divorcios_post_pandemia = {}
-    for año,div in divorcios_por_año.items():
-        if año <= 2020: divorcios_pre_pandemia[año] = div
-        if año in [2020,2021,2022]: divorcios_pandemia[año] = div
-        if año >= 2022: divorcios_post_pandemia[año] = div
-
-    plt.plot(list(divorcios_pre_pandemia.keys()),list(divorcios_pre_pandemia.values()),color='b',marker='o', linestyle='-')
-    plt.plot(list(divorcios_pandemia.keys()),list(divorcios_pandemia.values()),color='r',marker='o', linestyle='-')
-    plt.plot(list(divorcios_post_pandemia.keys()),list(divorcios_post_pandemia.values()),color='b',marker='o', linestyle='-')
-    plt.xlabel("Año")
-    plt.ylabel("Divorcios")
-    plt.suptitle("Cantidad de Divorcios por Año", fontsize = 14)
-    plt.title('En rojo vemos los años afectados por la pandemia. En azul, el resto de los años',fontsize= 10)
-    plt.show()
-
-
-def meses_divorcio(archivo,año):
-    with open(archivo, 'rt', encoding='utf-8-sig') as f:
-        rows = csv.reader(f)
-        headers = next(rows)
-        meses = set()
-
-        for row in rows:
-            record = dict(zip(headers, row))
-            if record["FECHA_MATRIMONIO"][5:9] == str(año): meses.add(record["FECHA_MATRIMONIO"][2:5])
-        
-    return meses
 #%%
 
 
@@ -260,10 +217,25 @@ proporcion_divorcios = divorcios_2018/ matrimonios_2018 if matrimonios_2018 > 0 
 print("Total de matrimonios en 2018:", matrimonios_2018)
 print("Total de divorcios de matrimonios de 2018:", divorcios_2018)
 print("Proporción de divorcios respecto al total de matrimonios en 2018:", f"{proporcion_divorcios:.2%}")
+
+
+labels = ['Casados', 'Divorciados']
+sizes = [matrimonios_2018 - divorcios_2018, divorcios_2018]
+colors = ['lightskyblue','lightcoral']
+explode = (0.1, 0)  # Resalta la primera porción
+
+# Crear el gráfico de torta
+plt.pie(sizes, explode=explode, labels=labels, colors=colors, autopct='%1.1f%%', shadow=True, startangle=140)
+plt.title('Distribución de Matrimonios del 2018')
+plt.show()
 #%%
 # --------- Ejercicio 4 ---------
 # llamada de funcion
 proporciones_2018 = proporciones_divorcios_por_genero_2018(dic)
+#colors = ['lightskyblue', 'lightcoral', 'lightseagreen', 'lightpink', 'lightgoldenrodyellow', 'lightgreen']
+#explode = (0.1, 0, 0, 0, 0, 0)  # Resalta la primera porción
+#plt.pie(proporciones_2018.values(), explode=explode, labels=proporciones_2018.keys(), colors=colors, autopct='%1.1f%%', shadow=True, startangle=140)
+
 plt.bar(proporciones_2018.keys(), proporciones_2018.values(), color=["skyblue"], width=0.8)
 plt.xlabel("Tipo de Matrimonio")
 plt.ylabel("Proporción de Divorcios en 2018")
@@ -272,20 +244,13 @@ plt.xticks(rotation=45)  # Rotar las etiquetas del eje x para mejor legibilidad
 plt.show()
 #%%
 # ------ Ejercicio 5 ----------
-graficar_divorcios(dic)
-print("Teniendo en cuenta que la pandemia abarcó del año 2020 al 2022, observamos que la misma aumentó la cantidad de divorcios")
-print("Cabe destacar que el año 2020 fue un año particular por dos razones. En primer lugar, la pandemia empezo a afectar a Argentina en Marzo, por lo tanto el mes de Enero y Febrero continuan con la tendencia de los años prepandemia. En segundo lugar fue caracterizado por un encierro casi absoluto de la poblacion, lo que produjo que no se pudiera tramitar el divorcio")
-print("Esto justifica que el año 2020 fuese un año bajo en cantidad de divorcios a pesar de que la pandemia aumentó los mismos.")
-#Para demostrar que no se registraron divorcios en todos los meses del 2020, crearemos la siguiente funcion:
-print(meses_divorcio(archivo,2020))
-
-
-dic_pre,dic_pandemia,dic_post = catalogar_pademia(archivo)
 """
 Pre Pandemia: 02 nov 2015 - 20 mar 2020 => 1600 dias
 Pandemia: 20 mar 2020 - 31 mar 2022 => 741 dias
 Post Pandemia: 31 mar 2022 - 20 sep 2024 => 904 dias
 """
+dic_pre,dic_pandemia,dic_post = catalogar_pademia(archivo)
+
 inicio_dataset = datetime.strptime("2015-11-02", "%Y-%m-%d")
 inicio_pandemia = datetime.strptime("2020-03-20", "%Y-%m-%d")
 fin_pandemia = datetime.strptime("2022-03-31", "%Y-%m-%d")
@@ -297,15 +262,46 @@ prom_d3 = sum(dic_post.values()) / (fin_dataset-fin_pandemia).days
 
 proms = [prom_d1,prom_d2,prom_d3]
 labels = ['Pre Pandemia', 'Pandemia', 'Post Pandemia']
-
-plt.bar(labels, proms, color=['blue', 'green', 'red'])
-
-# Añade títulos y etiquetas
-plt.xlabel('Periodo')
-plt.ylabel('Promedio de Divorcios')
+colors = ['yellowgreen', 'lightcoral', 'lightskyblue']
+plt.bar(labels, proms, color=colors)
 plt.title('Promedio de Divorcios por Período')
-
-# Muestra el gráfico
 plt.show()
 
+
+duracion_pre = duracion_promedio(dic_pre)
+duracion_pandemia = duracion_promedio(dic_pandemia)
+duracion_post = duracion_promedio(dic_post)
+
+duraciones = [duracion_pre,duracion_pandemia,duracion_post]
+print(duraciones)
+plt.bar(labels, duraciones, color=colors)
+plt.title('Duracion Promedio de Divorcios por Período')
+plt.show()
+
+
+tipos_pre = [sum(d.values()) / (inicio_pandemia-inicio_dataset).days for d in separa_tipos(dic_pre)] 
+tipos_pandemia = [sum(d.values()) / (fin_pandemia-inicio_pandemia).days for d in separa_tipos(dic_pandemia)] 
+tipos_post = [sum(d.values()) / (fin_dataset-fin_pandemia).days for d in separa_tipos(dic_post)] 
+
+prop_pre = [ x / sum(tipos_pre) for x in tipos_pre]
+prop_pandemia = [ x / sum(tipos_pandemia) for x in tipos_pandemia]
+prop_post = [ x / sum(tipos_post) for x in tipos_post]
+
+#valores = np.array([prop_pre, prop_pandemia,prop_post]).T
+valores = np.array([tipos_pre, tipos_pandemia,tipos_post]).T
+
+fig, ax = plt.subplots()
+
+# Crear las barras apiladas
+for i in range(len(valores)):
+    if i == 0:
+        ax.bar(labels, valores[i], label=f'Valor {i+1}')
+    else:
+        ax.bar(labels, valores[i], bottom=np.sum(valores[:i], axis=0), label=f'Valor {i+1}')
+
+# Añadir etiquetas, título y leyenda
+ax.set_xlabel('Valores')
+ax.set_ylabel('Proporciones')
+ax.set_title('Proporcion de Divorcios por Tipo por Periodo')
+plt.show()
 #%%
