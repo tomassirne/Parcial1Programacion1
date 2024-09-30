@@ -59,10 +59,10 @@ def separa_tipos(divorcios):
     for k,v in divorcios.items():
         if "Masculino" in k:
             if "Femenino" in k: dic_mf[k] = v 
-            elif "No declara" in k or "x" in k or "Indefinido" in k : dic_mn[k] = v 
+            elif "No declara" in k or "X" in k or "Indefinido" in k : dic_mn[k] = v 
             else: dic_mm[k] = v
         elif "Femenino" in k :
-            if "No declara" in k or "x" in k or "Indefinido" in k : dic_fn[k] = v
+            if "No declara" in k or "X" in k or "Indefinido" in k : dic_fn[k] = v
             else: dic_ff[k] = v
         else: dic_nn[k] = v
     
