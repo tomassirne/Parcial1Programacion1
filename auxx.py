@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+from datetime import datetime
 
 a = "26SEP2019:09:24:50"
 
@@ -20,3 +21,7 @@ else: print("N-N")
 d = {("a","f"):1,("b","f"):2}
 ls = [k[0] for k,v in d.items() for i in range(v)]
 print(ls)
+
+
+diferencia = (datetime.strptime("2020-03-20", "%Y-%m-%d")-datetime.strptime("2015-11-02", "%Y-%m-%d")).days
+print(diferencia)

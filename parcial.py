@@ -285,9 +285,14 @@ Pre Pandemia: 02 nov 2015 - 20 mar 2020 => 1600 dias
 Pandemia: 20 mar 2020 - 31 mar 2022 => 741 dias
 Post Pandemia: 31 mar 2022 - 20 sep 2024 => 904 dias
 """
-prom_d1 = sum(dic_pre.values()) / 1600
-prom_d2= sum(dic_pandemia.values()) / 741
-prom_d3 = sum(dic_post.values()) / 904
+inicio_dataset = datetime.strptime("2015-11-02", "%Y-%m-%d")
+inicio_pandemia = datetime.strptime("2020-03-20", "%Y-%m-%d")
+fin_pandemia = datetime.strptime("2022-03-31", "%Y-%m-%d")
+fin_dataset = datetime.strptime("2024-09-20", "%Y-%m-%d")
+
+prom_d1 = sum(dic_pre.values()) / (inicio_pandemia-inicio_dataset).days
+prom_d2= sum(dic_pandemia.values()) / (fin_pandemia-inicio_pandemia).days
+prom_d3 = sum(dic_post.values()) / (fin_dataset-fin_pandemia).days
 
 proms = [prom_d1,prom_d2,prom_d3]
 labels = ['Pre Pandemia', 'Pandemia', 'Post Pandemia']
