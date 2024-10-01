@@ -68,3 +68,9 @@ ax.bar(grupos, valores2, bottom = valores1)
 
 plt.show() 
  
+
+
+a = [6,4]
+b = [2,2]
+
+print(a/b)

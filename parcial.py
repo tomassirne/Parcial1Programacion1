@@ -75,6 +75,33 @@ def promedio_por_tipos(divorcios):
 #%%
 # ------ Ejercicio 3 -----------
 from datetime import datetime
+import csv
+import matplotlib.pyplot as plt
+from datetime import datetime
+import numpy as np
+
+# ------ Ejercicio 0 ----------
+def catalogar_matrimonios(archivo):
+    with open(archivo, 'rt', encoding='utf-8-sig') as f:
+        rows = csv.reader(f)
+        headers = next(rows)
+        diccionario = {}
+
+        for row in rows:
+            record = dict(zip(headers, row))
+            if record["genero_1"] == "": record["genero_1"] = "No declara"
+            if record["genero_2"] == "": record["genero_2"] = "No declara"
+            
+      
+        
+            clave = (record["genero_1"],record["genero_2"],record["fecha_matrimonio"][0:4])
+            
+
+            if clave in diccionario: diccionario[clave] += 1
+            else: diccionario[clave] = 1
+    return diccionario
+
+
 
 def leer_fechas_matrimonios(archivo_csv):
     """Lee las fechas de los matrimonios desde un archivo CSV."""
@@ -90,16 +117,7 @@ def leer_fechas_matrimonios(archivo_csv):
                 pass  # Ignora registros con formato de fecha inválido
     return fechas
 
-def contar_matrimonios_2018(fechas):
-    """Cuenta los matrimonios registrados en 2018 a partir de una lista de fechas."""
-    contador = 0
-    for fecha in fechas:
-        if fecha.year == 2018:
-            contador += 1
-    return contador
-
-
-def contar_divorcios_2018(diccionario):
+def contar_matrimoniosdiv_2018(diccionario):
   contador = 0
   for clave, valor in diccionario.items():
     if clave[2] == '2018':
@@ -111,63 +129,6 @@ def contar_divorcios_2018(diccionario):
 
 #%%
 # --------- Ejercicio 4 -------
-def proporciones_divorcios_por_genero_2018(diccionario):
-    proporciones = {
-        "Masculino-Masculino": 0,
-        "Masculino-Femenino": 0,
-        "Femenino-Femenino": 0,
-        "Masculino-No declara": 0,
-        "Femenino-No declara": 0,
-        "No declara-No declara": 0
-    }
-    total_divorcios_2018 = 0
-
-    # Recorrer el diccionario
-    for clave, valor in diccionario.items():
-        # Verificar que la clave tiene exactamente 4 elementos
-        if len(clave) == 4:
-            genero_1, genero_2, anio_matrimonio, anio_divorcio = clave
-            
-            # Convertir años a enteros para comparar correctamente
-            if int(anio_matrimonio) == 2018 and int(anio_divorcio) >= 2018:
-                tipo_matrimonio = f"{genero_1}-{genero_2}"
-                
-                # Sumar al total de divorcios
-                proporciones[tipo_matrimonio] = proporciones.setdefault(tipo_matrimonio, 0) + valor
-                total_divorcios_2018 += valor
-        else:
-            print(f"Clave con formato incorrecto: {clave}, omitiendo este registro.")
-    
-    # Calcular las proporciones
-    if total_divorcios_2018 > 0:
-        for tipo in proporciones:
-            proporciones[tipo] /= total_divorcios_2018
-    else:
-        print("No hay divorcios registrados para parejas que se casaron en 2018.") 
-    
-    return proporciones
-
-
-# Función que integra la separación de tipos y el cálculo de proporciones
-def calcular_proporciones_con_separacion(diccionario):
-    # Llamar a la función separa_tipos que ya tienes implementada
-    tipos_separados = separa_tipos(diccionario)  # Separa los tipos de matrimonios
-    
-    proporciones_totales = {}
-
-    # Iterar sobre los diccionarios separados que están dentro de la tupla
-    for sub_diccionario in tipos_separados:
-        # Verificar que sea un diccionario
-        if isinstance(sub_diccionario, dict):
-            # Calcular las proporciones para el sub-diccionario de cada tipo de matrimonio
-            proporciones_por_tipo = proporciones_divorcios_por_genero_2018(sub_diccionario)
-            
-            # Añadir la proporción del tipo actual a las proporciones totales
-            for tipo, proporcion in proporciones_por_tipo.items():
-                proporciones_totales[tipo] = proporciones_totales.get(tipo, 0) + proporcion
-    
-    return proporciones_totales
-
 
 #%%
 # ------ Ejercicio 5 ----------
@@ -242,24 +203,24 @@ for k,v in prom_tipos.items():
 # -------- Ejercicio 3 ---------
 # Ejemplo de uso
 archivo_csv = 'matrimonios_2018.csv'
-fechas_matrimonios = leer_fechas_matrimonios(archivo_csv)
-numero_matrimonios_2018 = contar_matrimonios_2018(fechas_matrimonios)
+dic_matrimonios = catalogar_matrimonios(archivo_csv)
+numero_matrimonios_2018 = contar_matrimoniosdiv_2018(dic_matrimonios)
 
 
 # Llamar a las funciones
-matrimonios_2018 = contar_matrimonios_2018(fechas_matrimonios)
-divorcios_2018 = contar_divorcios_2018(dic)
+
+divorcios_2018 = contar_matrimoniosdiv_2018(dic)
 
 # Calcular la proporción de divorcios
-proporcion_divorcios = divorcios_2018/ matrimonios_2018 if matrimonios_2018 > 0 else 0
+proporcion_divorcios = divorcios_2018/ numero_matrimonios_2018
 
-print("Total de matrimonios en 2018:", matrimonios_2018)
+print("Total de matrimonios en 2018:", numero_matrimonios_2018)
 print("Total de divorcios de matrimonios de 2018:", divorcios_2018)
 print("Proporción de divorcios respecto al total de matrimonios en 2018:", f"{proporcion_divorcios:.2%}")
 
 
 labels = ['Casados', 'Divorciados']
-sizes = [matrimonios_2018 - divorcios_2018, divorcios_2018]
+sizes = [numero_matrimonios_2018 - divorcios_2018, divorcios_2018]
 colors = ['lightskyblue','lightcoral']
 explode = (0.1, 0)  # Resalta la primera porción
 
@@ -270,22 +231,25 @@ plt.show()
 #%%
 # --------- Ejercicio 4 ---------
 # Ejemplo de uso
-# Supongo que ya tienes el diccionario de registros de divorcios `dic`
-proporciones_2018 = calcular_proporciones_con_separacion(dic)
-
+matrimonios_separados = separa_tipos(dic_matrimonios)
+divorcios_separados = separa_tipos(dic)
+recuento_divorcios = [contar_matrimoniosdiv_2018(tipo) for tipo in divorcios_separados]
+recuento_matrimonios = [contar_matrimoniosdiv_2018(tipo) for tipo in matrimonios_separados]
+proporciones =  [recuento_divorcios[i] / recuento_matrimonios[i] for i in range(len(recuento_matrimonios))]
 # Visualización de las proporciones usando un gráfico de barras
 import matplotlib.pyplot as plt
 
-plt.bar(proporciones_2018.keys(), proporciones_2018.values(), color="skyblue", width=0.8)
-plt.xlabel("Tipo de Matrimonio")
-plt.ylabel("Proporción de Divorcios en 2018")
-plt.title("Proporción de Divorcios por Género en 2018")
-plt.xticks(rotation=45)  # Rotar las etiquetas del eje x para mejor legibilidad
-plt.show()
-#colors = ['lightskyblue', 'lightcoral', 'lightseagreen', 'lightpink', 'lightgoldenrodyellow', 'lightgreen']
-#explode = (0.1, 0, 0, 0, 0, 0)  # Resalta la primera porción
-#plt.pie(proporciones_2018.values(), explode=explode, labels=proporciones_2018.keys(), colors=colors, autopct='%1.1f%%', shadow=True, startangle=140)
 
+colors = ['lightskyblue', 'lightcoral', 'lightseagreen', 'lightpink', 'lightgoldenrodyellow', 'lightgreen']
+explode = (0, 0, 0, 0, 0, 0)  # Resalta la primera porción
+plt.pie(proporciones, explode=explode, labels=["M-M","F-F","M-F","N-N","F-N","M-N"], colors=colors, autopct='%1.1f%%', shadow=True, startangle=140)
+plt.title("proporcion de divorcios 2018")
+plt.show()
+print(f"De los tipos de genero no declara, hay pocos datos en relacion a la cantidad total; por lo tanto no es conveniente sacar conclusiones de estos mismos.")
+print(f'------------------------------------')
+print(f'En el ejercicio, notamos que la duracion promedio de los matrimonios que se divorcian siendo del mismo genero, duran un aproximado de 6 años; por lo tannto es natural que estos tipos de matrimonios tengan la proporcion mas alta, calculando el periodo(periodo 2018-2024)')
+print(f'------------------------------------')
+print(f'si hacemos este analisis dentro de un par de años, los resultados seran posiblementes distintos, ya que habra mas tiempo para posibles divorcios de otros tipos de matrimonio.')
 #%%
 # ------ Ejercicio 5 ----------
 """
@@ -331,8 +295,8 @@ prop_pre = [ x / sum(tipos_pre) for x in tipos_pre]
 prop_pandemia = [ x / sum(tipos_pandemia) for x in tipos_pandemia]
 prop_post = [ x / sum(tipos_post) for x in tipos_post]
 
-#valores = np.array([prop_pre, prop_pandemia,prop_post]).T
-valores = np.array([tipos_pre, tipos_pandemia,tipos_post]).T
+valores = np.array([prop_pre, prop_pandemia,prop_post]).T
+#valores = np.array([tipos_pre, tipos_pandemia,tipos_post]).T
 
 fig, ax = plt.subplots()
 
@@ -349,5 +313,6 @@ ax.set_ylabel('Proporciones')
 ax.set_title('Proporcion de Divorcios por Tipo por Periodo')
 plt.show()
 #%%
-print(fechas_matrimonios)
+print(recuento_divorcios)
+print(recuento_matrimonios)
 
