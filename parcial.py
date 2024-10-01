@@ -76,26 +76,33 @@ def promedio_por_tipos(divorcios):
 # ------ Ejercicio 3 -----------
 from datetime import datetime
 
-def contar_matrimonios_2018(archivo_csv):
-    """Cuenta los matrimonios registrados en 2018."""
-    contador = 0
+def leer_fechas_matrimonios(archivo_csv):
+    """Lee las fechas de los matrimonios desde un archivo CSV."""
+    fechas = []
     with open(archivo_csv, 'r') as csvfile:
         lector = csv.reader(csvfile)
         next(lector)  # Saltar la cabecera
         for fila in lector:
             try:
                 fecha_matrimonio = datetime.strptime(fila[0], "%Y-%m-%d")
-                if fecha_matrimonio.year == 2018:
-                    contador += 1
-                else: print("ERROR 2018")
+                fechas.append(fecha_matrimonio)
             except ValueError:
                 pass  # Ignora registros con formato de fecha inválido
+    return fechas
+
+def contar_matrimonios_2018(fechas):
+    """Cuenta los matrimonios registrados en 2018 a partir de una lista de fechas."""
+    contador = 0
+    for fecha in fechas:
+        if fecha.year == 2018:
+            contador += 1
     return contador
+
 
 def contar_divorcios_2018(diccionario):
   contador = 0
   for clave, valor in diccionario.items():
-    if clave[2] >= '2018':
+    if clave[2] == '2018':
       contador += valor
   return contador
 
@@ -136,7 +143,7 @@ def proporciones_divorcios_por_genero_2018(diccionario):
         for tipo in proporciones:
             proporciones[tipo] /= total_divorcios_2018
     else:
-        print("No hay divorcios registrados para parejas que se casaron en 2018.")
+        print("No hay divorcios registrados para parejas que se casaron en 2018.") 
     
     return proporciones
 
@@ -233,8 +240,14 @@ for k,v in prom_tipos.items():
     print(f"La duracion promedio de matrimonios {k} que se divorciaron es {v:.2f} años.")
     #%%
 # -------- Ejercicio 3 ---------
+# Ejemplo de uso
+archivo_csv = 'matrimonios_2018.csv'
+fechas_matrimonios = leer_fechas_matrimonios(archivo_csv)
+numero_matrimonios_2018 = contar_matrimonios_2018(fechas_matrimonios)
+
+
 # Llamar a las funciones
-matrimonios_2018 = contar_matrimonios_2018("matrimonios_2018.csv")
+matrimonios_2018 = contar_matrimonios_2018(fechas_matrimonios)
 divorcios_2018 = contar_divorcios_2018(dic)
 
 # Calcular la proporción de divorcios
@@ -336,4 +349,5 @@ ax.set_ylabel('Proporciones')
 ax.set_title('Proporcion de Divorcios por Tipo por Periodo')
 plt.show()
 #%%
-print(dic)
+print(fechas_matrimonios)
+
