@@ -263,10 +263,12 @@ inicio_dataset = datetime.strptime("2015-11-02", "%Y-%m-%d")
 inicio_pandemia = datetime.strptime("2020-03-20", "%Y-%m-%d")
 fin_pandemia = datetime.strptime("2022-03-31", "%Y-%m-%d")
 fin_dataset = datetime.strptime("2024-09-20", "%Y-%m-%d")
+tiempo_dataset = (fin_dataset-inicio_dataset).days
 
 prom_d1 = sum(dic_pre.values()) / (inicio_pandemia-inicio_dataset).days
 prom_d2= sum(dic_pandemia.values()) / (fin_pandemia-inicio_pandemia).days
 prom_d3 = sum(dic_post.values()) / (fin_dataset-fin_pandemia).days
+
 
 proms = [prom_d1,prom_d2,prom_d3]
 labels = ['Pre Pandemia', 'Pandemia', 'Post Pandemia']
@@ -275,44 +277,18 @@ plt.bar(labels, proms, color=colors)
 plt.title('Promedio de Divorcios por Período')
 plt.show()
 
+total = sum(dic_pre.values())+sum(dic_pandemia.values())+sum(dic_post.values())
+prop = [sum(dic_pre.values())/total,sum(dic_pandemia.values())/total,sum(dic_post.values())/total]
 
-duracion_pre = duracion_promedio(dic_pre)
-duracion_pandemia = duracion_promedio(dic_pandemia)
-duracion_post = duracion_promedio(dic_post)
-
-duraciones = [duracion_pre,duracion_pandemia,duracion_post]
-print(duraciones)
-plt.bar(labels, duraciones, color=colors)
-plt.title('Duracion Promedio de Divorcios por Período')
+colors = ['lightskyblue', 'lightcoral', 'lightseagreen']
+explode = (0, 0.1, 0)  # Resalta la primera porción
+plt.pie(prop, explode=explode, labels=["Pre","Pandemia","Post"], colors=colors, autopct='%1.1f%%', shadow=True, startangle=140)
+plt.title("Proporcion de Divorcios en el Dataset")
 plt.show()
 
 
-tipos_pre = [sum(d.values()) / (inicio_pandemia-inicio_dataset).days for d in separa_tipos(dic_pre)] 
-tipos_pandemia = [sum(d.values()) / (fin_pandemia-inicio_pandemia).days for d in separa_tipos(dic_pandemia)] 
-tipos_post = [sum(d.values()) / (fin_dataset-fin_pandemia).days for d in separa_tipos(dic_post)] 
-
-prop_pre = [ x / sum(tipos_pre) for x in tipos_pre]
-prop_pandemia = [ x / sum(tipos_pandemia) for x in tipos_pandemia]
-prop_post = [ x / sum(tipos_post) for x in tipos_post]
-
-valores = np.array([prop_pre, prop_pandemia,prop_post]).T
-#valores = np.array([tipos_pre, tipos_pandemia,tipos_post]).T
-
-fig, ax = plt.subplots()
-
-# Crear las barras apiladas
-for i in range(len(valores)):
-    if i == 0:
-        ax.bar(labels, valores[i], label=f'Valor {i+1}')
-    else:
-        ax.bar(labels, valores[i], bottom=np.sum(valores[:i], axis=0), label=f'Valor {i+1}')
-
-# Añadir etiquetas, título y leyenda
-ax.set_xlabel('Valores')
-ax.set_ylabel('Proporciones')
-ax.set_title('Proporcion de Divorcios por Tipo por Periodo')
-plt.show()
+print("Conclusiones:")
+print("La pandemia elevó el número de divorcios")
+print(f"Habiendo abarcado solo un {(fin_pandemia-inicio_pandemia).days /tiempo_dataset *100 :.1f}% del tiempo, en pandemia se divorciaron un {prop[1] *100 :.1f}% de los divorcios del dataset ")
 #%%
-print(recuento_divorcios)
-print(recuento_matrimonios)
 
