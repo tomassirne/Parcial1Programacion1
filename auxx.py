@@ -2,8 +2,10 @@ import matplotlib.pyplot as plt
 from datetime import datetime
 
 a = "26SEP2019:09:24:50"
+b= "2018-01-02"
 
 print(a[0:2])
+print(b[0:4])
 
 t = ("N","F")
 if "M" in t:
