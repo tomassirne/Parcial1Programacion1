@@ -74,13 +74,7 @@ def promedio_por_tipos(divorcios):
     return {"Masculino-Masculino": duracion_promedio(dic_mm),"Masculino-Femenino": duracion_promedio(dic_mf),"Masculino-No declara": duracion_promedio(dic_mn),"Femenino-Femenino": duracion_promedio(dic_ff),"Femenino-No declara": duracion_promedio(dic_fn),"No declara-No declara": duracion_promedio(dic_nn)}
 #%%
 # ------ Ejercicio 3 -----------
-from datetime import datetime
-import csv
-import matplotlib.pyplot as plt
-from datetime import datetime
-import numpy as np
 
-# ------ Ejercicio 0 ----------
 def catalogar_matrimonios(archivo):
     with open(archivo, 'rt', encoding='utf-8-sig') as f:
         rows = csv.reader(f)
@@ -91,31 +85,12 @@ def catalogar_matrimonios(archivo):
             record = dict(zip(headers, row))
             if record["genero_1"] == "": record["genero_1"] = "No declara"
             if record["genero_2"] == "": record["genero_2"] = "No declara"
-            
-      
         
             clave = (record["genero_1"],record["genero_2"],record["fecha_matrimonio"][0:4])
-            
 
             if clave in diccionario: diccionario[clave] += 1
             else: diccionario[clave] = 1
     return diccionario
-
-
-
-def leer_fechas_matrimonios(archivo_csv):
-    """Lee las fechas de los matrimonios desde un archivo CSV."""
-    fechas = []
-    with open(archivo_csv, 'r') as csvfile:
-        lector = csv.reader(csvfile)
-        next(lector)  # Saltar la cabecera
-        for fila in lector:
-            try:
-                fecha_matrimonio = datetime.strptime(fila[0], "%Y-%m-%d")
-                fechas.append(fecha_matrimonio)
-            except ValueError:
-                pass  # Ignora registros con formato de fecha inválido
-    return fechas
 
 def contar_matrimoniosdiv_2018(diccionario):
   contador = 0
@@ -124,11 +99,6 @@ def contar_matrimoniosdiv_2018(diccionario):
       contador += valor
   return contador
 
-
-
-
-#%%
-# --------- Ejercicio 4 -------
 
 #%%
 # ------ Ejercicio 5 ----------
@@ -172,15 +142,15 @@ def catalogar_pademia(archivo):
 
 # ------ Ejercicio 0 ----------
 archivo = "dataset_divorcios.csv"
-dic = catalogar(archivo)
+dic_div = catalogar(archivo)
 #%%
 
 
 # ------ Ejercicio 1 ----------
-duracion = duracion_matrimonios_divorciados(dic)
-print(f"La duracion maxima de matrimonios que se divorciaron es {duracion_matrimonios_divorciados(dic)[0]} años.")
-print(f"La duracion minima de matrimonios que se divorciaron es {duracion_matrimonios_divorciados(dic)[1]} años.")
-print(f"La duracion promedio de matrimonios que se divorciaron es {duracion_matrimonios_divorciados(dic)[2]:.2f} años.")
+duracion = duracion_matrimonios_divorciados(dic_div)
+print(f"La duracion maxima de matrimonios que se divorciaron es {duracion_matrimonios_divorciados(dic_div)[0]} años.")
+print(f"La duracion minima de matrimonios que se divorciaron es {duracion_matrimonios_divorciados(dic_div)[1]} años.")
+print(f"La duracion promedio de matrimonios que se divorciaron es {duracion_matrimonios_divorciados(dic_div)[2]:.2f} años.")
 #%%
 
 
@@ -196,60 +166,63 @@ Tipos de Matrimonio:
     No declara - No declara
 """
 
-prom_tipos = promedio_por_tipos(dic)
+prom_tipos = promedio_por_tipos(dic_div)
 for k,v in prom_tipos.items():
     print(f"La duracion promedio de matrimonios {k} que se divorciaron es {v:.2f} años.")
-    #%%
+
+#%%
 # -------- Ejercicio 3 ---------
-# Ejemplo de uso
 archivo_csv = 'matrimonios_2018.csv'
 dic_matrimonios = catalogar_matrimonios(archivo_csv)
-numero_matrimonios_2018 = contar_matrimoniosdiv_2018(dic_matrimonios)
+matrimonios_2018 = contar_matrimoniosdiv_2018(dic_matrimonios)
 
-
-# Llamar a las funciones
-
-divorcios_2018 = contar_matrimoniosdiv_2018(dic)
+divorcios_2018 = contar_matrimoniosdiv_2018(dic_div)
 
 # Calcular la proporción de divorcios
-proporcion_divorcios = divorcios_2018/ numero_matrimonios_2018
+proporcion_divorcios = divorcios_2018/ matrimonios_2018
 
-print("Total de matrimonios en 2018:", numero_matrimonios_2018)
+print("Total de matrimonios en 2018:", matrimonios_2018)
 print("Total de divorcios de matrimonios de 2018:", divorcios_2018)
 print("Proporción de divorcios respecto al total de matrimonios en 2018:", f"{proporcion_divorcios:.2%}")
 
 
 labels = ['Casados', 'Divorciados']
-sizes = [numero_matrimonios_2018 - divorcios_2018, divorcios_2018]
+sizes = [matrimonios_2018 - divorcios_2018, divorcios_2018]
 colors = ['lightskyblue','lightcoral']
-explode = (0.1, 0)  # Resalta la primera porción
+explode = (0.1, 0)
 
 # Crear el gráfico de torta
 plt.pie(sizes, explode=explode, labels=labels, colors=colors, autopct='%1.1f%%', shadow=True, startangle=140)
-plt.title('Distribución de Matrimonios del 2018')
+plt.title('Distribución de Matrimonios del 2018 y sus Divorcios')
 plt.show()
 #%%
 # --------- Ejercicio 4 ---------
-# Ejemplo de uso
 matrimonios_separados = separa_tipos(dic_matrimonios)
-divorcios_separados = separa_tipos(dic)
+divorcios_separados = separa_tipos(dic_div)
+
 recuento_divorcios = [contar_matrimoniosdiv_2018(tipo) for tipo in divorcios_separados]
 recuento_matrimonios = [contar_matrimoniosdiv_2018(tipo) for tipo in matrimonios_separados]
-proporciones =  [recuento_divorcios[i] / recuento_matrimonios[i] for i in range(len(recuento_matrimonios))]
-# Visualización de las proporciones usando un gráfico de barras
-import matplotlib.pyplot as plt
 
+prop_divorcios = [recuento_divorcios[i] / recuento_matrimonios[i] for i in range(len(recuento_divorcios))]
+prop_matrimonios = [(recuento_matrimonios[i]-recuento_divorcios[i]) /recuento_matrimonios[i] for i in range(len(recuento_matrimonios))]
 
-colors = ['lightskyblue', 'lightcoral', 'lightseagreen', 'lightpink', 'lightgoldenrodyellow', 'lightgreen']
-explode = (0, 0, 0, 0, 0, 0)  # Resalta la primera porción
-plt.pie(proporciones, explode=explode, labels=["M-M","F-F","M-F","N-N","F-N","M-N"], colors=colors, autopct='%1.1f%%', shadow=True, startangle=140)
-plt.title("proporcion de divorcios 2018")
+# Gráfico de barras apiladas
+fig, ax = plt.subplots()
+tipos= ["M-M","F-F","M-F","N-N","F-N","M-N"]
+ax.bar(tipos, prop_matrimonios, label="Casados",color='lightskyblue')
+ax.bar(tipos, prop_divorcios, bottom = prop_matrimonios, label="Divorciados", color='lightcoral')
+plt.title("Proporción de Matrimonios del 2018 y sus Divorcios por Tipos")
+ax.legend(loc = 'lower right')
 plt.show()
-print(f"De los tipos de genero no declara, hay pocos datos en relacion a la cantidad total; por lo tanto no es conveniente sacar conclusiones de estos mismos.")
+
+for i in range(len(tipos)):
+    print(f"El total de matrimonios {tipos[i]} en 2018 fue de: {recuento_matrimonios[i]}. De los cuales, {recuento_divorcios[i]} se divorciaron. ({prop_divorcios[i]*100 :.1f}%)")
+
+print(f"De los matrimonio que alguno de sus integrantes no declaró genero hay pocos datos y estos no constituyen una muestra significativa; por lo tanto no es conveniente sacar conclusiones de los mismos.")
 print(f'------------------------------------')
-print(f'En el ejercicio, notamos que la duracion promedio de los matrimonios que se divorcian siendo del mismo genero, duran un aproximado de 6 años; por lo tannto es natural que estos tipos de matrimonios tengan la proporcion mas alta, calculando el periodo(periodo 2018-2024)')
+print(f'En el ejercicio 2, notamos que la duracion promedio de los matrimonios que se divorcian siendo del mismo genero, duran un aproximado de 6 años; por lo tannto es natural que estos tipos de matrimonios tengan la proporcion mas alta, calculando el periodo(periodo 2018-2024)')
 print(f'------------------------------------')
-print(f'si hacemos este analisis dentro de un par de años, los resultados seran posiblementes distintos, ya que habra mas tiempo para posibles divorcios de otros tipos de matrimonio.')
+print(f'Si hacemos este analisis dentro de un par de años, los resultados seran posiblementes distintos, ya que habra mas tiempo para posibles divorcios de otros tipos de matrimonio.')
 #%%
 # ------ Ejercicio 5 ----------
 """
@@ -271,6 +244,8 @@ prom_d3 = sum(dic_post.values()) / (fin_dataset-fin_pandemia).days
 
 
 proms = [prom_d1,prom_d2,prom_d3]
+
+# Gráfico de barras
 labels = ['Pre Pandemia', 'Pandemia', 'Post Pandemia']
 colors = ['yellowgreen', 'lightcoral', 'lightskyblue']
 plt.bar(labels, proms, color=colors)
@@ -280,9 +255,10 @@ plt.show()
 total = sum(dic_pre.values())+sum(dic_pandemia.values())+sum(dic_post.values())
 prop = [sum(dic_pre.values())/total,sum(dic_pandemia.values())/total,sum(dic_post.values())/total]
 
+# Gráfico de torta
 colors = ['lightskyblue', 'lightcoral', 'lightseagreen']
-explode = (0, 0.1, 0)  # Resalta la primera porción
-plt.pie(prop, explode=explode, labels=["Pre","Pandemia","Post"], colors=colors, autopct='%1.1f%%', shadow=True, startangle=140)
+explode = (0, 0.1, 0) 
+plt.pie(prop, explode=explode, labels=labels, colors=colors, autopct='%1.1f%%', shadow=True, startangle=140)
 plt.title("Proporcion de Divorcios en el Dataset")
 plt.show()
 
